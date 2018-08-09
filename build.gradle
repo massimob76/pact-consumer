@@ -1,0 +1,22 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.4.RELEASE'
+    id 'java'
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter:2.0.4.RELEASE'
+    testCompile("org.springframework.boot:spring-boot-starter-test:2.0.4.RELEASE") {
+        exclude group: 'junit', module: 'junit'
+    }
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testCompile 'org.hamcrest:hamcrest-core:1.3'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+repositories {
+    jcenter()
+}
