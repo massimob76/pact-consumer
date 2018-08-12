@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pact.consumer.dto.ScoreUsername;
 import pact.consumer.dto.ScoreUsernameTimestamp;
+import pact.consumer.exception.UserNotFoundException;
 
 import java.time.Instant;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @ExtendWith({ PactConsumerTestExt.class, SpringExtension.class })
@@ -33,6 +35,7 @@ class ScoreClientTest {
     private static final ScoreUsernameTimestamp SCORE_USERNAME_TIMESTAMP =
             new ScoreUsernameTimestamp("John", 123, Instant.parse("2007-12-03T10:15:30.00Z"));
     private static final ScoreUsername SCORE_USERNAME = new ScoreUsername("Pete", 124);
+    private static final UserNotFoundException PETE_NOT_FOUND = new UserNotFoundException("Could not find user: Pete");
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -78,6 +81,27 @@ class ScoreClientTest {
     @PactTestFor(pactMethod="primeScore")
     void getScore() {
         assertEquals(SCORE_USERNAME_TIMESTAMP, scoreClient.getScore("John"));
+    }
+
+    @Pact(provider="pact-provider", consumer="pact-consumer")
+    RequestResponsePact primeUserNotFound(PactDslWithProvider builder) throws JsonProcessingException {
+        return builder
+                .given("John has scored 123")
+                .uponReceiving("getScore")
+                .path("/api/v1/scores/Pete")
+                .method("GET")
+                .willRespondWith()
+                .headers(HEADERS)
+                .status(HttpStatus.NOT_FOUND.value())
+                .body(objectMapper.writeValueAsString(PETE_NOT_FOUND))
+                .toPact();
+    }
+
+    @Test
+    @PactTestFor(pactMethod="primeUserNotFound")
+    void getScore_whenNotFound() {
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () -> scoreClient.getScore("Pete"));
+        assertEquals("Could not find user: Pete", userNotFoundException.getMessage());
     }
 
     @Pact(provider="pact-provider", consumer="pact-consumer")

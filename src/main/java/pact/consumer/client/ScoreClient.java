@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pact.consumer.dto.ScoreUsername;
 import pact.consumer.dto.ScoreUsernameTimestamp;
+import pact.consumer.exception.UserNotFoundException;
 
 @Service
 public class ScoreClient {
@@ -31,8 +33,8 @@ public class ScoreClient {
         .getBody();
   }
 
-  public ScoreUsernameTimestamp getScore(String name) {
-    return restTemplate.getForObject(baseUrl + "/" + name, ScoreUsernameTimestamp.class);
+  public ScoreUsernameTimestamp getScore(String name) throws UserNotFoundException {
+      return restTemplate.getForObject(baseUrl + "/" + name, ScoreUsernameTimestamp.class);
   }
 
   public void createScore(String name, int score) {
