@@ -1,5 +1,11 @@
 package pact.consumer.client;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
@@ -7,28 +13,23 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pact.consumer.dto.ScoreUsername;
 import pact.consumer.dto.ScoreUsernameTimestamp;
 import pact.consumer.exception.UserNotFoundException;
 
-import java.time.Instant;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @ExtendWith({ PactConsumerTestExt.class, SpringExtension.class })
-@PactTestFor(port = "8090")
+@PactTestFor(port = "8095")
 @SpringBootTest
+@TestPropertySource("classpath:application.yml")
 class ScoreClientTest {
 
     private static final Map<String, String> HEADERS = singletonMap("Content-Type", APPLICATION_JSON_VALUE);
